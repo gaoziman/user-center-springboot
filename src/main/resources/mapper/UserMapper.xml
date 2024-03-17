@@ -6,17 +6,17 @@
         <!--@Table `user`-->
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="username" jdbcType="VARCHAR" property="username"/>
-        <result column="userAccount" jdbcType="VARCHAR" property="useraccount"/>
-        <result column="avatarUrl" jdbcType="VARCHAR" property="avatarurl"/>
+        <result column="userAccount" jdbcType="VARCHAR" property="userAccount"/>
+        <result column="avatarUrl" jdbcType="VARCHAR" property="avatarUrl"/>
         <result column="gender" jdbcType="TINYINT" property="gender"/>
-        <result column="userPassword" jdbcType="VARCHAR" property="userpassword"/>
+        <result column="userPassword" jdbcType="VARCHAR" property="userPassword"/>
         <result column="phone" jdbcType="VARCHAR" property="phone"/>
         <result column="email" jdbcType="VARCHAR" property="email"/>
-        <result column="userStatus" jdbcType="INTEGER" property="userstatus"/>
-        <result column="createTime" jdbcType="TIMESTAMP" property="createtime"/>
-        <result column="updateTime" jdbcType="TIMESTAMP" property="updatetime"/>
-        <result column="isDelete" jdbcType="TINYINT" property="isdelete"/>
-        <result column="userRole" jdbcType="TINYINT" property="userrole"/>
+        <result column="userStatus" jdbcType="INTEGER" property="userStatus"/>
+        <result column="createTime" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="updateTime" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="isDelete" jdbcType="TINYINT" property="isDelete"/>
+        <result column="userRole" jdbcType="TINYINT" property="userRole"/>
     </resultMap>
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
