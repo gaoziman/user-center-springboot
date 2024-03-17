@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "star-code.`user`")
+@TableName(value = "`user`")
 public class User implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;

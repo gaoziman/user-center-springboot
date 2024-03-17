@@ -1,6 +1,7 @@
 package org.javatop.usercenter;
 
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.Environment;
 
@@ -10,6 +11,7 @@ import org.springframework.core.env.Environment;
  * @date 2024-03-17 21:31
  * @description : 启动类
  */
+@SpringBootApplication
 public class UserCenterApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(UserCenterApplication.class, args);
