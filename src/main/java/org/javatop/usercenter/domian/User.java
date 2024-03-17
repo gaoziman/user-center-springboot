@@ -40,25 +40,25 @@ public class User implements Serializable {
      * 用户账号
      */
     @TableField(value = "userAccount")
-    private String useraccount;
+    private String userAccount;
 
     /**
      * 头像地址
      */
     @TableField(value = "avatarUrl")
-    private String avatarurl;
+    private String avatarUrl;
 
     /**
      * 性别
      */
     @TableField(value = "gender")
-    private Byte gender;
+    private Integer gender;
 
     /**
      * 用户密码
      */
     @TableField(value = "userPassword")
-    private String userpassword;
+    private String userPassword;
 
     /**
      * 电话号码
@@ -76,33 +76,33 @@ public class User implements Serializable {
      * 用户状态（0-正常，1-封号）
      */
     @TableField(value = "userStatus")
-    private Integer userstatus;
+    private Integer userStatus;
 
     /**
      * 创建时间
      */
     @TableField(value = "createTime")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date createtime;
+    private Date createTime;
 
     /**
      * 更新时间
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @TableField(value = "updateTime")
-    private Date updatetime;
+    private Date updateTime;
 
     /**
      * 删除状态（0-正常，1-删除）
      */
     @TableField(value = "isDelete")
-    private Byte isdelete;
+    private Integer isDelete;
 
     /**
      * 用户角色
      */
     @TableField(value = "userRole")
-    private Byte userrole;
+    private Integer userRole;
 
     private static final long serialVersionUID = 1L;
 }
