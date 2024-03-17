@@ -7,27 +7,28 @@ import org.springframework.web.bind.annotation.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+
 /**
- * (star-code.`user`)表控制层
+ * (user)表控制层
  *
  * @author Leo
  */
 @RestController
 @RequestMapping("/user")
 public class UserController {
-
     @Autowired
     private UserService userService;
 
+
     /**
-     * 通过主键查询单条数据
+     * 查询所有用户
      *
-     * @param id 主键
-     * @return 单条数据
+     * @return {@link List}<{@link User}>
      */
-    @GetMapping("/{id}")
-    public User selectOne(@PathVariable Integer id) {
-        return userService.getById(id);
+    @GetMapping("/list")
+    public List<User> list() {
+        return userService.list();
     }
 
 }
