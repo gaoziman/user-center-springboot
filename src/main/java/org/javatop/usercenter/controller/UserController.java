@@ -31,4 +31,16 @@ public class UserController {
         return userService.list();
     }
 
+    /**
+     * 注册
+     * @param userAccount 用户账号
+     * @param userPassword 用户密码
+     * @param checkPassword 确认密码
+     * @return 注册成功-返回用户id，注册失败-抛出异常
+     */
+    @PostMapping("/register")
+    public long register(String userAccount, String userPassword, String checkPassword) {
+        return userService.register(userAccount, userPassword, checkPassword);
+    }
+
 }
