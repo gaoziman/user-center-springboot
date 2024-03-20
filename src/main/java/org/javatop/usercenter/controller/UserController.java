@@ -39,7 +39,7 @@ public class UserController {
      * @return 注册成功-返回用户id，注册失败-抛出异常
      */
     @PostMapping("/register")
-    public long register(String userAccount, String userPassword, String checkPassword) {
+    public Long register(String userAccount, String userPassword, String checkPassword) {
         return userService.register(userAccount, userPassword, checkPassword);
     }
 
