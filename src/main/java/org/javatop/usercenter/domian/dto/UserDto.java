@@ -29,6 +29,8 @@ public class UserDto {
 
     private Integer gender;
 
+    private Integer userRole;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
 }

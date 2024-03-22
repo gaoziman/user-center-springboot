@@ -6,7 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.javatop.usercenter.domian.dto.UserDto;
 import org.javatop.usercenter.mapper.MapUserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.regex.Pattern;
@@ -18,6 +17,9 @@ import org.javatop.usercenter.service.UserService;
 import org.springframework.util.DigestUtils;
 
 import javax.servlet.http.HttpServletRequest;
+
+import static org.javatop.usercenter.constant.UserConstant.USERACCOUNT_PATTERN;
+import static org.javatop.usercenter.constant.UserConstant.USER_LOGIN_STATE;
 
 
 /**
@@ -31,13 +33,10 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
 
-    // 正则表达式规则：以字母开头，仅包含字母、数字和下划线
-    private static final String USERACCOUNT_PATTERN = "^[A-Za-z]\\w+$";
 
     // 编译正则表达式为Pattern对象
     private static final Pattern pattern = Pattern.compile(USERACCOUNT_PATTERN);
     public static final String SALT = "Leo";
-    public static final String USER_LOGIN_STATE = "userLoginState";
 
     @Autowired
     private MapUserMapper mapUserMapper;
@@ -153,9 +152,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             return null;
         }
         //3. 将用户信息进行脱敏。并返回user
-        request.getSession().setAttribute(USER_LOGIN_STATE , selectUser);
-        return mapUserMapper.toUserDto(selectUser);
+        UserDto userDto = mapUserMapper.toUserDto(selectUser);
+        request.getSession().setAttribute(USER_LOGIN_STATE , userDto);
+        return userDto;
     }
-
 
 }
