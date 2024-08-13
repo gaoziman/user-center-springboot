@@ -1,4 +1,4 @@
-package org.javatop.usercenter.constant;
+package org.javatop.usercenter.common.constant;
 
 /**
  * @author : Leo

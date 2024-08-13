@@ -1,9 +1,8 @@
 package org.javatop.usercenter.service;
 
-import org.javatop.usercenter.domian.User;
 import com.baomidou.mybatisplus.extension.service.IService;
-import org.javatop.usercenter.domian.dto.UserDto;
-import org.springframework.http.HttpRequest;
+import org.javatop.usercenter.domian.User;
+import org.javatop.usercenter.util.Result;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -24,7 +23,7 @@ public interface UserService extends IService<User>{
      * @param checkPassword 确认密码
      * @return 注册成功-返回用户id，注册失败-抛出异常
      */
-    long register(String userAccount ,String userPassword,String checkPassword);
+    Result register(String userAccount , String userPassword, String checkPassword);
 
 
     /**
@@ -33,6 +32,6 @@ public interface UserService extends IService<User>{
      * @param userPassword 用户密码
      * @return 登录成功-返回用户信息，登录失败-抛出异常
      */
-    UserDto login(String userAccount , String userPassword, HttpServletRequest request);
+    Result login(String userAccount , String userPassword, HttpServletRequest request);
 
 }

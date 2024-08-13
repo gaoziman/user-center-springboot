@@ -3,21 +3,23 @@ package org.javatop.usercenter.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.javatop.usercenter.common.enums.HttpStatusEnum;
 import org.javatop.usercenter.domian.User;
 import org.javatop.usercenter.domian.dto.UserDto;
-import org.javatop.usercenter.domian.vo.UserVo;
+import org.javatop.usercenter.domian.vo.RegisterVO;
+import org.javatop.usercenter.domian.vo.UserVO;
+import org.javatop.usercenter.exception.BizException;
 import org.javatop.usercenter.service.UserService;
+import org.javatop.usercenter.util.Result;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
 import java.util.List;
 
-import static org.javatop.usercenter.constant.UserConstant.ADMIN_ROLE;
-import static org.javatop.usercenter.constant.UserConstant.USER_LOGIN_STATE;
+import static org.javatop.usercenter.common.constant.UserConstant.ADMIN_ROLE;
+import static org.javatop.usercenter.common.constant.UserConstant.USER_LOGIN_STATE;
 
 /**
  * (user)表控制层
@@ -34,89 +36,81 @@ public class UserController {
 
     /**
      * 查询所有用户
-     *
-     * @return {@link List}<{@link User}>
      */
     @GetMapping("/list")
-    public List<User> list() {
-        return userService.list();
+    public Result<List<User>> list() {
+        return Result.success(userService.list());
     }
 
     /**
      * 用户注册
-     * @param userAccount 用户账号
-     * @param userPassword 用户密码
-     * @param checkPassword 确认密码
-     * @return 注册成功-返回用户id，注册失败-抛出异常
+     *
+     * @param vo 注册信息
+     * @return Result
      */
     @PostMapping("/register")
-    public Long register(String userAccount, String userPassword, String checkPassword) {
-        return userService.register(userAccount, userPassword, checkPassword);
+    public Result register(@Validated @RequestBody RegisterVO vo) {
+        return userService.register(vo.getUserAccount(), vo.getUserPassword(), vo.getCheckPassword());
     }
 
 
     /**
      * 用户登录
-     * @param userVo 用户信息
+     *
+     * @param userVo  用户信息
      * @param request 请求
      * @return 登录成功-返回用户信息，登录失败-抛出异常
      */
     @PostMapping("/login")
-    public UserDto login(@RequestBody UserVo userVo, HttpServletRequest request){
-        if (userVo == null){
-            return null;
-        }
+    public Result login(@Validated @RequestBody UserVO userVo, HttpServletRequest request) {
         String userAccount = userVo.getUserAccount();
         String userPassword = userVo.getUserPassword();
-        // 首先校验一遍参数
-        if (StringUtils.isAnyBlank(userAccount,userPassword)){
-            return null;
-        }
-        return userService.login(userAccount,userPassword,request);
+        return userService.login(userAccount, userPassword, request);
     }
 
 
     /**
      * 用户查询
-     * @param username 用户名
-     * @param request 请求
-     * @return
      */
     @GetMapping("/search")
-    public List<User> searchUser(String username,HttpServletRequest request) {
+    public Result<List<User>> searchUser(String username, HttpServletRequest request) {
         if (!isAdmin(request)) {
-            return new ArrayList<>();
+            throw new BizException(HttpStatusEnum.UNAUTHORIZED);
         }
         QueryWrapper<User> wrapper = new QueryWrapper<>();
         if (StringUtils.isNotBlank(username)) {
             wrapper.like("username", username);
         }
-        return userService.list(wrapper);
+        return Result.success(userService.list());
     }
 
 
     /**
      * 删除用户
-     * @param id 用户id
-     * @param request 请求
-     * @return
      */
-    @PostMapping("/delete/{id}")
-    public boolean deleteUser(@PathVariable Long id,HttpServletRequest request) {
+    @DeleteMapping("/delete/{id}")
+    public Result deleteUser(@PathVariable Long id, HttpServletRequest request) {
         if (!isAdmin(request)) {
-            return false;
+            throw new BizException(HttpStatusEnum.UNAUTHORIZED);
         }
         // 判断用户id是否合法
         if (id <= 0) {
             log.info("用户id不合法");
-            return false;
+            throw new BizException(HttpStatusEnum.ERROR);
         }
-        return userService.removeById(id);
+        boolean b = userService.removeById(id);
+
+        if (!b) {
+            log.info("删除用户失败");
+            throw new BizException(HttpStatusEnum.ERROR);
+        }
+        return Result.success();
     }
 
 
     /**
      * 判断用户是否为管理员
+     *
      * @param request 请求
      * @return true-是管理员，false-不是管理员
      */

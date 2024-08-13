@@ -3,13 +3,17 @@ server:
   servlet:
     session:
       timeout: 86400
+      store-type: redis
 
 
 spring:
+  session:
+    timeout: 86400
+    store-type: redis
   datasource:
-    url: jdbc:mysql://localhost:3306/star-code?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf-8
+    url: jdbc:mysql://localhost:3306/usercenter?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf-8
     username: root
-    password: root  #数据库名、用户名和密码改为自己的
+    password: gzm2001..  #数据库名、用户名和密码改为自己的
     driver-class-name: com.mysql.cj.jdbc.Driver
 
 

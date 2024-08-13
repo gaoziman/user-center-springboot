@@ -1,25 +1,25 @@
 package org.javatop.usercenter.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+import org.javatop.usercenter.common.enums.HttpStatusEnum;
+import org.javatop.usercenter.domian.User;
 import org.javatop.usercenter.domian.dto.UserDto;
+import org.javatop.usercenter.exception.BizException;
 import org.javatop.usercenter.mapper.MapUserMapper;
+import org.javatop.usercenter.mapper.UserMapper;
+import org.javatop.usercenter.service.UserService;
+import org.javatop.usercenter.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.regex.Pattern;
-
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.javatop.usercenter.mapper.UserMapper;
-import org.javatop.usercenter.domian.User;
-import org.javatop.usercenter.service.UserService;
 import org.springframework.util.DigestUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.regex.Pattern;
 
-import static org.javatop.usercenter.constant.UserConstant.USERACCOUNT_PATTERN;
-import static org.javatop.usercenter.constant.UserConstant.USER_LOGIN_STATE;
+import static org.javatop.usercenter.common.constant.UserConstant.USERACCOUNT_PATTERN;
+import static org.javatop.usercenter.common.constant.UserConstant.USER_LOGIN_STATE;
 
 
 /**
@@ -44,6 +44,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     /**
      * 校验用户名是否合法
+     *
      * @param userAccount 用户名
      * @return true 合法，false 不合法
      */
@@ -61,38 +62,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return 注册成功后返回用户id
      */
     @Override
-    public long register(String userAccount, String userPassword, String checkPassword) {
-        // 1. 校验
-        // 1.1 非空判断
-        if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
-            // todo 自定义异常
-            return -1;
-        }
-
-        // 1.2 账户长度 不小于 4 位
-        if (userAccount.length() < 4) {
-            return -1;
-        }
-        // 1.3 密码长度 不小于 8 位
-        if (userPassword.length() < 8 || checkPassword.length() < 8) {
-            return -1;
-        }
-
-        //1.4 账户名不包含特殊字符
+    public Result register(String userAccount, String userPassword, String checkPassword) {
+        // 1.4 账户名不包含特殊字符
 
         if (!validateUserAccount(userAccount)) {
-            return -1;
+            throw new BizException(HttpStatusEnum.PARAM_NOT_VALID);
         }
 
-        //1.5 账户名不能重复
+        // 1.5 账户名不能重复
         User user = baseMapper.selectOne(new QueryWrapper<User>().eq("userAccount", userAccount));
         if (user != null) {
-            return -1;
+            throw new BizException(HttpStatusEnum.USERNAME_EXIST);
         }
 
-        //1.6 密码和校验密码相同
+        // 1.6 密码和校验密码相同
         if (!userPassword.equals(checkPassword)) {
-            return -1;
+            throw new BizException(HttpStatusEnum.PASSWORD_NOT_MATCH);
         }
         // 2.加密 加盐 + 用户密码
         String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
@@ -104,57 +89,43 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         saveUser.setUsername(userAccount);
         int row = baseMapper.insert(saveUser);
         if (row != 1) {
-            return -1;
+            throw new BizException(HttpStatusEnum.ERROR);
         }
         log.info("saveUser:{}", userAccount);
-        return saveUser.getId();
+        return Result.success();
     }
 
 
     /**
      * 登录
-     * @param userAccount   用户账号
-     * @param userPassword  用户密码
+     *
+     * @param userAccount  用户账号
+     * @param userPassword 用户密码
      * @return 登录成功后返回用户信息
      */
     @Override
-    public UserDto login(String userAccount, String userPassword, HttpServletRequest request) {
-        // 1. 首先需要对前端传过来的参数进行校验。
-        //  1.1 非空校验（不能为null）
-        if (StringUtils.isAnyBlank(userAccount, userPassword)) {
-            // todo 自定义异常
-            return null;
-        }
-        //  1.2 账户长度 不小于 4 位
-        if (userAccount.length() < 4) {
-            return null;
-        }
-        //  1.3 密码长度 不小于 8 位
-        if (userPassword.length() < 8) {
-            return null;
-        }
-        //  1.4 账户名不包含特殊字符
+    public Result login(String userAccount, String userPassword, HttpServletRequest request) {
         if (!validateUserAccount(userAccount)) {
             log.info("账户名包含特殊字符,selectUser:{}", userAccount);
-            return null;
+            throw new BizException(HttpStatusEnum.PARAM_NOT_VALID);
         }
 
-        //2. 检验用户输入密码是否和数据库密码一致。需要和数据库中的密文密码去对比
+        // 2. 检验用户输入密码是否和数据库密码一致。需要和数据库中的密文密码去对比
         User selectUser = baseMapper.selectOne(new QueryWrapper<User>().eq("userAccount", userAccount));
         // 用户不存在
         if (selectUser == null) {
             log.info("用户不存在,selectUser:{}", userAccount);
-            return null;
+            throw new BizException(HttpStatusEnum.USERNAME_NOT_FOUND);
         }
         if (!selectUser.getUserPassword().equals(DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes()))) {
             // 密码错误
             log.info("密码错误,selectUser:{}", userAccount);
-            return null;
+            throw new BizException(HttpStatusEnum.USERNAME_OR_PWD_ERROR);
         }
-        //3. 将用户信息进行脱敏。并返回user
+        // 3. 将用户信息进行脱敏。并返回user
         UserDto userDto = mapUserMapper.toUserDto(selectUser);
-        request.getSession().setAttribute(USER_LOGIN_STATE , userDto);
-        return userDto;
+        request.getSession().setAttribute(USER_LOGIN_STATE, userDto);
+        return Result.success(userDto);
     }
 
 }
