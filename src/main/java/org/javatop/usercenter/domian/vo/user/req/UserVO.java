@@ -1,4 +1,4 @@
-package org.javatop.usercenter.domian.vo;
+package org.javatop.usercenter.domian.vo.user.req;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

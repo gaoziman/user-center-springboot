@@ -1,8 +1,10 @@
-package org.javatop.usercenter.mapper;
+package org.javatop.usercenter.convert;
 
 import org.javatop.usercenter.domian.User;
 import org.javatop.usercenter.domian.dto.UserDto;
 import org.mapstruct.Mapper;
+
+import java.util.List;
 
 /**
  * @author : Leo
@@ -20,6 +22,8 @@ public interface MapUserMapper {
      * @return 转换后的用户Dto对象
      */
     UserDto toUserDto(User user);
+
+    List<UserDto> toUserDtoList(List<User> userList);
 }
 
 

@@ -2,6 +2,9 @@ package org.javatop.usercenter.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.javatop.usercenter.domian.User;
+import org.javatop.usercenter.domian.vo.user.req.UpdateUserVO;
+import org.javatop.usercenter.domian.vo.user.req.UserPageListVO;
+import org.javatop.usercenter.util.PageResponse;
 import org.javatop.usercenter.util.Result;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,4 +37,19 @@ public interface UserService extends IService<User>{
      */
     Result login(String userAccount , String userPassword, HttpServletRequest request);
 
+
+    /**
+     * 更新用户信息
+     * @param updateUserVO 用户信息
+     * @return 更新成功-返回用户信息，更新失败-抛出异常
+     */
+    Result updateUser(UpdateUserVO updateUserVO);
+
+
+    /**
+     * 分页查询用户列表
+     * @param userPageListVO 分页查询条件
+     * @return 分页查询结果
+     */
+    PageResponse pageList(UserPageListVO userPageListVO);
 }

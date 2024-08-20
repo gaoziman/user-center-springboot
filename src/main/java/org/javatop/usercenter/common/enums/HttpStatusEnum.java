@@ -53,7 +53,9 @@ public enum HttpStatusEnum implements BaseExceptionInterface {
 
     USERNAME_EXIST(20006, "用户名已存在！"),
 
-    PASSWORD_NOT_MATCH(20007, "两次密码输入不一致！");
+    PASSWORD_NOT_MATCH(20007, "两次密码输入不一致！"),
+
+    FILE_UPLOAD_FAILED(20008, "文件上传失败！");
 
 
     private final Integer code;

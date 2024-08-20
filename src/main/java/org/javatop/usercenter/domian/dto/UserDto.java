@@ -17,7 +17,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDto {
-    private Long id;
+    private Integer id;
 
     private String username;
 
@@ -27,10 +27,13 @@ public class UserDto {
 
     private String email;
 
-    private Integer gender;
+    private String avatarUrl;
 
-    private Integer userRole;
+    private Integer gender;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
+
+    private Integer userRole;
+
 }

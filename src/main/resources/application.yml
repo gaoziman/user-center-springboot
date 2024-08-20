@@ -40,3 +40,11 @@ mybatis-plus:
 logging:
   level:
     org.javatop.usercenter.mapper: debug
+
+
+
+minio:
+  endpoint: http://180.188.45.71:9000
+  accessKey: 8O87HZUVES8BYS4KFMJS
+  secretKey: rkXzTFCsCulKmx+pkP3zjbzrunREyEkudCNHweh3
+  bucketName: leocoder

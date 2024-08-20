@@ -1,15 +1,13 @@
 package org.javatop.usercenter.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.javatop.usercenter.common.enums.HttpStatusEnum;
 import org.javatop.usercenter.domian.User;
 import org.javatop.usercenter.domian.dto.UserDto;
-import org.javatop.usercenter.domian.vo.RegisterVO;
-import org.javatop.usercenter.domian.vo.UserVO;
+import org.javatop.usercenter.domian.vo.user.req.*;
 import org.javatop.usercenter.exception.BizException;
 import org.javatop.usercenter.service.UserService;
+import org.javatop.usercenter.util.PageResponse;
 import org.javatop.usercenter.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -72,16 +70,12 @@ public class UserController {
     /**
      * 用户查询
      */
-    @GetMapping("/search")
-    public Result<List<User>> searchUser(String username, HttpServletRequest request) {
+    @PostMapping("/pageList")
+    public PageResponse userPageList(@RequestBody UserPageListVO userPageListVO, HttpServletRequest request) {
         if (!isAdmin(request)) {
             throw new BizException(HttpStatusEnum.UNAUTHORIZED);
         }
-        QueryWrapper<User> wrapper = new QueryWrapper<>();
-        if (StringUtils.isNotBlank(username)) {
-            wrapper.like("username", username);
-        }
-        return Result.success(userService.list());
+        return userService.pageList(userPageListVO);
     }
 
 
@@ -105,6 +99,14 @@ public class UserController {
             throw new BizException(HttpStatusEnum.ERROR);
         }
         return Result.success();
+    }
+
+    /**
+     * 更新用户
+     */
+    @PostMapping("/updateUser")
+    public Result updateUser(@RequestBody UpdateUserVO updateUserVO) {
+        return userService.updateUser(updateUserVO);
     }
 
 

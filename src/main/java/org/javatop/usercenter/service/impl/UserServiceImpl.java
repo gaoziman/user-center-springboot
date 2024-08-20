@@ -1,21 +1,26 @@
 package org.javatop.usercenter.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.javatop.usercenter.common.enums.HttpStatusEnum;
 import org.javatop.usercenter.domian.User;
 import org.javatop.usercenter.domian.dto.UserDto;
+import org.javatop.usercenter.domian.vo.user.req.UpdateUserVO;
+import org.javatop.usercenter.domian.vo.user.req.UserPageListVO;
 import org.javatop.usercenter.exception.BizException;
-import org.javatop.usercenter.mapper.MapUserMapper;
+import org.javatop.usercenter.convert.MapUserMapper;
 import org.javatop.usercenter.mapper.UserMapper;
 import org.javatop.usercenter.service.UserService;
+import org.javatop.usercenter.util.PageResponse;
 import org.javatop.usercenter.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import static org.javatop.usercenter.common.constant.UserConstant.USERACCOUNT_PATTERN;
@@ -40,7 +45,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Autowired
     private MapUserMapper mapUserMapper;
-
 
     /**
      * 校验用户名是否合法
@@ -128,4 +132,64 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return Result.success(userDto);
     }
 
+    /**
+     * 更新用户信息
+     *
+     * @param updateUserVO 用户信息
+     * @return 更新成功-返回用户信息，更新失败-抛出异常
+     */
+    @Override
+    public Result updateUser(UpdateUserVO updateUserVO) {
+        // 1. 获取用户信息
+        String userAccount = updateUserVO.getUserAccount();
+        String username = updateUserVO.getUsername();
+        String phone = updateUserVO.getPhone();
+        String avatarUrl = updateUserVO.getAvatarUrl();
+        String email = updateUserVO.getEmail();
+        Integer gender = updateUserVO.getGender();
+
+        // 2. 查询用户是否存在
+        User user = baseMapper.selectOne(new QueryWrapper<User>().eq("userAccount", userAccount));
+        if (user == null) {
+            throw new BizException(HttpStatusEnum.USERNAME_NOT_FOUND);
+        }
+
+        // 3. 更新用户信息
+        user.setUsername(username);
+        user.setPhone(phone);
+        user.setAvatarUrl(avatarUrl);
+        user.setEmail(email);
+        user.setGender(gender);
+        int row = baseMapper.updateById(user);
+        if (row != 1) {
+            throw new BizException(HttpStatusEnum.ERROR);
+        }
+        // 4. 返回用户信息
+        UserDto userDto = mapUserMapper.toUserDto(user);
+        return Result.success(userDto);
+    }
+
+
+    /**
+     * 分页查询用户列表
+     *
+     * @param userPageListVO 分页查询条件
+     * @return 分页查询结果
+     */
+    @Override
+    public PageResponse pageList(UserPageListVO userPageListVO) {
+        // 获取分页数据
+        Long pageNum = userPageListVO.getPageNum();
+        Long pageSize = userPageListVO.getPageSize();
+        String userAccount = userPageListVO.getUserAccount();
+        String email = userPageListVO.getEmail();
+        String phone = userPageListVO.getPhone();
+        // 封装查询条件
+        Page<User> userPage = baseMapper.selectPageList(pageNum, pageSize, userAccount, email, phone);
+        List<User> userList = userPage.getRecords();
+        // 转换为UserDto
+        List<UserDto> userDtoList = mapUserMapper.toUserDtoList(userList);
+        // 封装分页结果
+        return PageResponse.success(userPage, userDtoList);
+    }
 }
